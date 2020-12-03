@@ -50,6 +50,42 @@ def precipitation():
 
     return jsonify(results)
 
+@app.route("/api/v1.0/stations")
+def stations():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    results = session.query(station.station).all()
+
+    session.close()
+
+    return jsonify(results)
+
+@app.route("/api/v1.0/tobs")
+def tobs():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    results = session.query(measurement.date, measurement.tobs).filter(measurement.station == "USC00519281").filter(measurement.date>'2016-08-23').all()
+
+    session.close()
+
+    return jsonify(results)
+
+@app.route("/api/v1.0/temp/<start>")
+def temperaturestart(start):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    results = session.query(func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)).filter(measurement.date > start).all()
+
+    session.close()
+
+    return jsonify(results)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 @app.route("/api/v1.0/temp/<start>/<end>")
 def temperature(start, end):
     # Create our session (link) from Python to the DB
